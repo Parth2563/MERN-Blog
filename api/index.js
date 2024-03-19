@@ -7,9 +7,9 @@ import authenRoutes from './routes/authen.route.js';
 dotenv.config();
 //connectiong to database
 mongoose
-    .connect(process.env.MONGO, {serverSelectionTimeoutMS: 10000})
+    .connect(process.env.MONGO)
     .then(() => {
-        console.log('Connected to MongoDB');
+        console.log('Connected to MongoDB', {serverSelectionTimeoutMS: 5000,});
     })
     .catch((error) => {
         console.log('Error:', error);
