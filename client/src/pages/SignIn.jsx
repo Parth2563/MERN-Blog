@@ -1,12 +1,14 @@
 import {React, useState} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
+import { useDispatch, useSelector } from 'react-redux'
+import {signInStart, signInSuccess, signInFailure} from '../redux/user/userSlice'
 
 export default function SignIn() {
 
   const [formData, setFormData] = useState();//hook to store form data
-  const [errorMessages, setErrorMessages] = useState(null); //hook to store error messages
-  const [loading, setLoading] = useState(false); //Loading spinner functionality hook
+  const {loading, error : errorMessages} = useSelector((state) => state.user);//hook to get data from redux store
+  const dispatch = useDispatch();//to dispatch action to redux store
   const navigate = useNavigate();//to redirect user on particular page
   
   //dynamically storing data while user typing in particulr input field relative to its id
@@ -17,11 +19,10 @@ export default function SignIn() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if(!formData.email || !formData.password) {//empty field error
-      return setErrorMessages('Please fill out all fields.');
+      return dispatch(signInFailure('Please fill all the fields'));
     }
     try {
-      setLoading(true);
-      setErrorMessages(null);
+      dispatch(signInStart());//dispatching action to redux store to set loading to true
       const res = await fetch('/api/authen/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -29,10 +30,11 @@ export default function SignIn() {
       });
       const data = await res.json();
       if(data.success === false) {//error detected
-        setErrorMessages(data.message);
+        dispatch(signInFailure(data.message));//dispatching action to redux store to set error message
       }
-      setLoading(false);
+     
       if(res.ok) {
+        dispatch(signInSuccess(data));//dispatching action to redux store to set current user
         navigate('/');
       }
     } catch (error) {
