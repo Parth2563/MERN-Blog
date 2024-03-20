@@ -51,3 +51,34 @@ export const login = async (req, res, next) => {
         next(error);
     }
 };
+
+export const Google = async (req, res, next) => {
+    const {name, email, googlePhotoUrl} = req.body; //storing input from user
+    try {
+        const user = await User.findOne({email}); //finding user from the database
+        if(user) {
+            const token = jwt.sign({id: user._id}, process.env.JWT_SECRET);//creating token
+            const {password: pass, ...rest} = user._doc; //removing password from user object
+            res.status(200).cookie('access_token', token, { //storing token in cookie
+                httpOnly: true
+            }).json(rest);
+        } else {
+            const genratedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8); //generating password
+            const hashPassword = bcryptjs.hashSync(genratedPassword, 10); //hashing password
+            const newUser = new User({
+                username: name.toLowerCase().split(' ').join('') + Math.random().toString(9).slice(-4),
+                email,
+                password: hashPassword,
+                profilePicture: googlePhotoUrl,
+            }); //creating new user from schema
+            await newUser.save(); //saving to database
+            const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET);//creating token
+            const {password: pass, ...rest} = newUser._doc; //removing password from user object
+            res.status(200).cookie('access_token', token, { //storing token in cookie
+                httpOnly: true
+            }).json(rest);
+        }
+    } catch (error) {
+        next(error);
+    }
+};
