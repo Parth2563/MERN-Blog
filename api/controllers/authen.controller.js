@@ -11,7 +11,7 @@ export const signingup = async (req, res, next) => {
         next(errorHandler(400, 'All fields are required'));
     }
     //hashing password with 10 salting round
-    const hashPassword = await bcryptjs.hashSync(password, 10);
+    const hashPassword = bcryptjs.hashSync(password, 10);
     //creating new user from schema
     const newUser = new User({username, email, password: hashPassword});
     
