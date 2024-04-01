@@ -40,7 +40,7 @@ export const login = async (req, res, next) => {
             return next(errorHandler(400, 'Invalid Password'));
         }
         
-        const token = jwt.sign({id: validUser._id}, process.env.JWT_SECRET);//creating token
+        const token = jwt.sign({id: validUser._id, isAdmin: validUser.isAdmin}, process.env.JWT_SECRET);//creating token
 
         const {password: pass, ...rest} = validUser._doc; //removing password from user object
 
@@ -57,7 +57,7 @@ export const Google = async (req, res, next) => {
     try {
         const user = await User.findOne({email}); //finding user from the database
         if(user) {
-            const token = jwt.sign({id: user._id}, process.env.JWT_SECRET);//creating token
+            const token = jwt.sign({id: user._id, isAdmin: user.isAdmin}, process.env.JWT_SECRET);//creating token
             const {password: pass, ...rest} = user._doc; //removing password from user object
             res.status(200).cookie('access_token', token, { //storing token in cookie
                 httpOnly: true
@@ -72,7 +72,7 @@ export const Google = async (req, res, next) => {
                 profilePicture: googlePhotoUrl,
             }); //creating new user from schema
             await newUser.save(); //saving to database
-            const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET);//creating token
+            const token = jwt.sign({id: newUser._id, isAdmin: newUser.isAdmin}, process.env.JWT_SECRET);//creating token
             const {password: pass, ...rest} = newUser._doc; //removing password from user object
             res.status(200).cookie('access_token', token, { //storing token in cookie
                 httpOnly: true
