@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/user.route.js';
 import authenRoutes from './routes/authen.route.js';
 import postRoutes from './routes/post.route.js';
+import commentRoutes from './routes/comment.route.js';
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -30,6 +31,7 @@ app.listen(3000, () => {
 app.use('/api/user', userRoutes);
 app.use('/api/authen', authenRoutes);
 app.use('/api/post', postRoutes);
+app.use('/api/comment', commentRoutes);
 
 //adding middleware
 app.use((err, req, res, next) => {
